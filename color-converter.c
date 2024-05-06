@@ -34,9 +34,9 @@ int main(int argc, char *argv[]) {
 
 	if (strcmp(firstArg, "--rgb") == 0 || strcmp(firstArg, "-ir") == 0) {
 		if (validateArgs(argc, 5) == 0 && validateRGBArgs(argv[2], argv[3], argv[4]) == 0) {
-			int r = atoi(argv[2]); 
-			int g = atoi(argv[3]);
-			int b = atoi(argv[4]);
+			int r = strtol(argv[2], NULL, 10); 
+			int g = strtol(argv[3], NULL, 10);
+			int b = strtol(argv[4], NULL, 10);
 			convertRGBToHex(r, g, b);
 		}
 	}
