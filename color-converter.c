@@ -4,10 +4,14 @@
 #include <ctype.h>
 
 const int HEX_BASIS = 16;
-int charToInt(char c); 
+int charToInt(char c);
+char intToChar(int i);
 void getHelpOutput();
 int convertHexToRGB(char *hex);
-int validateArgs(int argc, char *args[]);
+int validateArgs(int argc, int minArgs);
+int convertRGBToHex(int r, int g, int b);
+int validateHexArgs(char *args);
+int validateRGBArgs(char *r, char *g, char *b);
 
 int main(int argc, char *argv[]) {
 	char *firstArg;
@@ -22,22 +26,27 @@ int main(int argc, char *argv[]) {
 	}
 
 	if (strcmp(firstArg, "--hexadecimal")  == 0|| strcmp(firstArg, "-ix") == 0) {
-		if (validateArgs(argc, argv) == 0) {
+		if (validateArgs(argc, 3) == 0 && validateHexArgs(argv[2]) == 0) {
 			char *hexArg = argv[2];
 			convertHexToRGB(hexArg);
 		}
 	}
 
 	if (strcmp(firstArg, "--rgb") == 0 || strcmp(firstArg, "-ir") == 0) {
-		printf("rgb - hex\n");
+		if (validateArgs(argc, 5) == 0 && validateRGBArgs(argv[2], argv[3], argv[4]) == 0) {
+			int r = atoi(argv[2]); 
+			int g = atoi(argv[3]);
+			int b = atoi(argv[4]);
+			convertRGBToHex(r, g, b);
+		}
 	}
  
 }
 
-int validateArgs(int argc, char *args[]) {
+int validateArgs(int argc, int minArgs) {
 	
-	if (argc < 3) {
-	printf("%d",argc);	
+	if (argc < minArgs) {
+	printf("%d\n",argc);	
 		printf("Incorrect number of arguments\n"); 
 		printf("Please provide a flag for hexadecimal or rgb input, followed by a hexadecimal or RGB value \n");
 		return 1;
@@ -45,11 +54,32 @@ int validateArgs(int argc, char *args[]) {
 	return 0;
 }
 
+int validateHexArgs(char *args) {
+	for (int i = 0; i < strlen(args); i++) {
+		int result = charToInt(args[i]);
+		if (result >= HEX_BASIS) return 1;
+	}
+	return 0;
+}
+
+int validateRGBArgs(char *r, char *g, char *b) {
+	char *args[] = {r, g, b};
+	for (int i = 0; i < 3; i++) {
+		if (atoi(args[i]) >= 256) {
+			return 1;
+		}
+		if (atoi(args[i]) < 0) {
+			return 1;
+		}
+	}	
+	return 0;
+}
+
 void getHelpOutput() {
 	printf("COLOR CONVERTER\n");
 	printf("This program is for converting colors between hexadecimal and RGB\n");
 	printf("To convert from hexadecimal to RGB, execute the program with the flag --hexadecimal or -ix\n");
-	printf("followed by xxxxxx (6 digits between 0 - F)\n");
+	printf("followed by ###### (6 digits between 0 - F)\n");
 	printf("To convert from RGB to hexadecimal, execute the program with the flag --rgb or -ir\n");
 	printf("followed by ## ## ##\n");
 	
@@ -106,3 +136,66 @@ int charToInt(char c) {
 	}
 
 }
+
+
+char intToChar(int i) {
+	switch(i) {
+		case 15:
+			return 'F';
+		case 14:
+			return 'E';
+		case 13:
+			return 'D';
+		case 12:
+			return 'C';
+		case 11:
+			return 'B';
+		case 10:
+			return 'A';
+		default:
+			return i + '0';
+	}
+}
+
+int convertRGBToHex(int r, int g, int b) {
+	char hex[8]= "#";
+	int bigR;
+	int smallR;
+	int bigG;
+	int smallG;
+	int bigB;
+	int smallB;
+	if (r > 15) {
+		bigR = r / HEX_BASIS;
+		smallR = r % HEX_BASIS;
+	} else {
+		bigR = 0;
+		smallR = r;
+	}
+
+	if (g > 15) {
+		bigG = g / HEX_BASIS;
+		smallG = g % HEX_BASIS;
+	} else {
+		bigG = 0;
+		smallG = g;
+	}
+	if (b > 15) {
+		bigB = b / HEX_BASIS;
+		smallB = b % HEX_BASIS;
+	} else {
+		bigB = 0;
+		smallB = b;
+	}
+	
+	hex[1] = intToChar(bigR);
+	hex[2] = intToChar(smallR);
+	hex[3] = intToChar(bigG);
+	hex[4] = intToChar(smallG);
+	hex[5] = intToChar(bigB);
+	hex[6] = intToChar(smallB);
+	hex[7] = '\0';
+	printf("Hex value is: %s\n", hex);
+	return 0;
+}
+
