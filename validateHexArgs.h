@@ -1,0 +1,1 @@
+int validateHexArgs(char *args);

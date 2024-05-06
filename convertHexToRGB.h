@@ -1,0 +1,1 @@
+int convertHexToRGB(char *hex);
